@@ -6,6 +6,14 @@ Fine-tuned `roberta-large` on 240K Yelp reviews for 3-class sentiment classifica
 
 ---
 
+## Project Context
+
+Developed as part of the Georgia Tech OMSA Practicum with PathSynch Labs Pod C. The broader project explored how review data and AI-generated reply workflows could support merchant-facing review management.
+
+This sentiment model was built for the review understanding layer: converting raw review text and star ratings into sentiment labels that could be used downstream in analytics, reply generation, and workflow instrumentation.
+
+---
+
 ## What This Project Demonstrates
 
 - Fine-tuning a transformer model for multi-class text classification
@@ -14,6 +22,18 @@ Fine-tuned `roberta-large` on 240K Yelp reviews for 3-class sentiment classifica
 - Evaluating model quality with precision, recall, F1, and confusion matrix
 - Packaging a trained model for deployment-ready inference
 - Working with unstructured text data at a larger sample scale
+
+---
+
+## My Contributions
+
+- Cleaned and prepared Yelp Academic Dataset review data
+- Removed duplicate rows during preprocessing
+- Converted star ratings into sentiment labels
+- Built stratified train/test splits for model evaluation
+- Optimized the sentiment analysis model workflow
+- Evaluated model performance with per-class metrics and a confusion matrix
+- Uploaded and maintained the model on Hugging Face for inference use
 
 ---
 
@@ -51,6 +71,7 @@ Actual  Neg  [ 7712   585    30]
 ## Dataset
 
 - **Source:** Yelp Academic Dataset (500K reviews)
+- **Cleaning:** 711 duplicate rows removed before modeling
 - **Label mapping:** 1–2 stars → Negative · 3 stars → Neutral · 4–5 stars → Positive
 - **Training samples:** 239,870 (stratified split)
 - **Test samples:** 40,000 (stratified, held-out)
