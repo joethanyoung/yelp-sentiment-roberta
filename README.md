@@ -14,6 +14,14 @@ The broader project involved merchant review workflows, stakeholder feedback, an
 
 The sentiment model was built for the review understanding layer: converting raw review text and star ratings into sentiment labels that could be used downstream in analytics, reply generation, and workflow instrumentation.
 
+Proprietary client data, stakeholder feedback, and implementation details are not included due to NDA constraints.
+
+---
+
+## Role in the Broader Workflow
+
+This model focuses on sentiment classification. In the broader internship project, sentiment labels were one input to downstream review analytics, AI reply workflows, and merchant-facing instrumentation.
+
 ---
 
 ## What This Project Demonstrates
@@ -142,4 +150,4 @@ print(id2label[result[0]["label"]], round(result[0]["score"], 4))
 
 ---
 
-*Developed as part of Georgia Tech OMSA Practicum, Spring 2026 — PathSynch Labs Pod C.*
+*Public, non-confidential version of an NDA-covered PathSynch Labs analytics internship project, Spring 2026.*
