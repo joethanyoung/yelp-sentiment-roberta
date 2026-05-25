@@ -6,6 +6,28 @@ Fine-tuned `roberta-large` on 240K Yelp reviews for 3-class sentiment classifica
 
 ---
 
+## What This Project Demonstrates
+
+- Fine-tuning a transformer model for multi-class text classification
+- Preparing star ratings as sentiment labels
+- Handling class imbalance with weighted loss
+- Evaluating model quality with precision, recall, F1, and confusion matrix
+- Packaging a trained model for deployment-ready inference
+- Working with unstructured text data at a larger sample scale
+
+---
+
+## Example Use Cases
+
+This type of model can support text analytics workflows such as:
+
+- Prioritizing negative customer feedback for review
+- Monitoring sentiment trends across large volumes of reviews
+- Tagging customer comments before downstream analysis
+- Creating service-quality signals from unstructured text
+
+---
+
 ## Results
 
 | Class | Precision | Recall | F1 |
@@ -45,6 +67,15 @@ Actual  Neg  [ 7712   585    30]
 | Hardware | NVIDIA A4000 (Paperspace Gradient) |
 
 Class-weighted loss was applied to address the natural imbalance in Yelp data (~55% positive reviews).
+
+---
+
+## Limitations
+
+- Yelp reviews are domain-specific; performance may not transfer directly to other types of customer feedback.
+- The neutral class is harder to classify than positive or negative reviews, as shown by the lower neutral F1 score.
+- Star ratings are used as sentiment labels, which can introduce noise when review text and rating do not fully agree.
+- Long reviews may be truncated to the model's maximum token length.
 
 ---
 
