@@ -4,6 +4,8 @@ Fine-tuned `roberta-large` on 240K Yelp reviews for 3-class sentiment classifica
 
 🤗 **Model on Hugging Face:** [Zhoyang/yelp-sentiment-roberta-large](https://huggingface.co/Zhoyang/yelp-sentiment-roberta-large)
 
+**Public usage signal:** the Hugging Face model had 17 downloads as of 2026-06-06.
+
 ---
 
 ## Project Context
@@ -147,6 +149,17 @@ print(id2label[result[0]["label"]], round(result[0]["score"], 4))
 ## Tech Stack
 
 `Python` · `PyTorch` · `Transformers` · `scikit-learn` · `pandas` · `matplotlib`
+
+## Open Source Maintenance
+
+- License: [MIT](./LICENSE)
+- Contributions: [CONTRIBUTING.md](./CONTRIBUTING.md)
+- Roadmap: [ROADMAP.md](./ROADMAP.md)
+- Security and responsible reporting: [SECURITY.md](./SECURITY.md)
+
+The current maintenance focus is reproducibility, clearer evaluation artifacts,
+responsible use guidance, and practical inference examples for public review
+analytics workflows.
 
 ---
 
