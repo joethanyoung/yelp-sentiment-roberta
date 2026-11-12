@@ -1,77 +1,44 @@
-# Yelp Sentiment Analysis — Fine-tuned RoBERTa-large
+# Calibrated Review Triage & Cost-Optimal Routing (RoBERTa-large)
 
-Fine-tuned `roberta-large` on 240K Yelp reviews for 3-class sentiment classification (Negative / Neutral / Positive). Achieved **93.76% accuracy** and **weighted F1 of 0.9389** on a held-out test set of 40,000 samples.
+Fine-tuned `FacebookAI/roberta-large` on 239,870 Yelp reviews for 3-class review classification (Negative 1–2★ / Neutral 3★ / Positive 4–5★), achieving **93.76% accuracy** and **0.9389 weighted F1** on a 40,000-review held-out test set—paired with a reproducible 500-review out-of-fold (OOF) probability calibration benchmark, selective human-review routing under capacity constraints, and a DKK review-cost versus missed-error trade-off calculator.
 
-🤗 **Model on Hugging Face:** [Zhoyang/yelp-sentiment-roberta-large](https://huggingface.co/Zhoyang/yelp-sentiment-roberta-large)
-
-**Public usage signal:** the Hugging Face model had 17 downloads as of 2026-06-06.
+- **Model Card & Full Benchmark:** [`Zhoyang/yelp-sentiment-roberta-large`](https://huggingface.co/Zhoyang/yelp-sentiment-roberta-large)
+- **Interactive Triage & Cost Trade-Off Space:** [`Zhoyang/yelp-sentiment-analyzer`](https://huggingface.co/spaces/Zhoyang/yelp-sentiment-analyzer)
+- **Public 500-Review Evaluation Set:** [`Zhoyang/yelp-sentiment-3class-eval`](https://huggingface.co/datasets/Zhoyang/yelp-sentiment-3class-eval)
+- **HF Collection:** [Calibrated Review Triage & Cost-Optimal Routing Suite](https://huggingface.co/collections/Zhoyang/calibrated-review-triage-and-cost-optimal-routing-suite-6ad605c8ded5824ee51efbd4)
 
 ---
 
 ## Project Context
 
-This repository is a non-confidential version of an NDA-covered analytics internship project with PathSynch Labs through Georgia Tech OMSA.
+This repository contains the public, non-confidential modeling and evaluation artifacts originally initiated during an NDA-covered analytics internship project with PathSynch Labs through the Georgia Tech OMSA Practicum (Spring 2026), followed by post-internship extensions on probability calibration, selective human-review routing, and review-cost trade-off analysis.
 
-The broader project involved merchant review workflows, stakeholder feedback, and client-facing deliverables. This public version focuses on the sentiment modeling component using the Yelp Academic Dataset, so the methodology can be shown without exposing proprietary data or client-specific details.
+In customer support and reputation management workflows, raw three-class sentiment predictions are most useful when paired with a routing rule: deciding which high-confidence reviews can be routed automatically and which low-margin predictions near the 2–3-star boundary should be sent to human review under a fixed review budget.
 
-The sentiment model was built for the review understanding layer: converting raw review text and star ratings into sentiment labels that could be used downstream in analytics, reply generation, and workflow instrumentation.
-
-Proprietary client data, stakeholder feedback, and implementation details are not included due to NDA constraints.
-
----
-
-## Role in the Broader Workflow
-
-This model focuses on sentiment classification. In the broader internship project, sentiment labels were one input to downstream review analytics, AI reply workflows, and merchant-facing instrumentation.
+Proprietary client data, stakeholder feedback, and client-specific implementation details are excluded under NDA constraints. All experiments, metrics, and benchmarks in this repository and linked Hugging Face artifacts use public Yelp data only.
 
 ---
 
 ## What This Project Demonstrates
 
-- Fine-tuning a transformer model for multi-class text classification
-- Preparing star ratings as sentiment labels
-- Handling class imbalance with weighted loss
-- Evaluating model quality with precision, recall, F1, and confusion matrix
-- Packaging a trained model for deployment-ready inference
-- Working with unstructured text data at a larger sample scale
+- **Controlled transformer fine-tuning (`roberta-large`, 355M parameters):** Seven iterations from a `bert-base` baseline, where expanding sequence length (`256 → 512` tokens, `+0.012` weighted F1) and applying EDA-driven class weights (`Negative 3.0 / Neutral 8.0 / Positive 1.5`) lifted Neutral-class F1 from `0.612` to `0.728`.
+- **Out-of-fold probability calibration:** 5-fold stratified temperature scaling on the pinned 500-review benchmark (`Zhoyang/yelp-sentiment-3class-eval`) reduces Expected Calibration Error (ECE) from `0.0364` to `0.0147` and NLL from `0.2372` to `0.2184`.
+- **Selective prediction & human-in-the-loop (HITL) triage:** Routing the lowest top-two probability-margin reviews to human review reduces the error rate among automatically routed reviews from `7.80%` (at `0%` review) to `4.86%` (at `~10%` review) and `2.75%` (at `~20%` review), while quantifying diminishing marginal returns (`1.85` reviews inspected per error caught at `0%→5%` vs. `4.67` cumulative at `20%`).
+- **Decision-theoretic cost trade-off framework:** Parameterizes human review cost per item (benchmarked using Statistics Denmark `LONS20` 2024 standardized hourly earnings for customer service clerks: `246.15 DKK/hour` → `4.10 DKK/review` at 1 minute/review) against hypothetical downstream missed-error loss to evaluate total cost across `0%–30%` routing tiers.
 
 ---
 
-## My Contributions
+## Evaluation 1: Original 40,000-Review Held-Out Test Set
 
-- Built the sentiment modeling component for the review understanding workflow
-- Cleaned and prepared Yelp Academic Dataset review data for the public model version
-- Removed duplicate rows during preprocessing
-- Converted star ratings into sentiment labels
-- Built stratified train/test splits for model evaluation
-- Optimized the sentiment analysis model workflow
-- Evaluated model performance with per-class metrics and a confusion matrix
-- Uploaded and maintained the model on Hugging Face for inference use
+| Class | Precision | Recall | F1 | Support |
+|---|---|---|---|---|
+| Negative (1–2★) | 0.9393 | 0.9261 | 0.9327 | 8,327 |
+| Neutral (3★) | 0.6934 | 0.7661 | 0.7280 | 4,207 |
+| Positive (4–5★) | 0.9789 | 0.9674 | 0.9731 | 27,466 |
+| **Overall / Weighted** | **0.9407** | **0.9376 (Acc)** | **0.9389** | **40,000** |
 
----
-
-## Example Use Cases
-
-This type of model can support text analytics workflows such as:
-
-- Prioritizing negative customer feedback for review
-- Monitoring sentiment trends across large volumes of reviews
-- Tagging customer comments before downstream analysis
-- Creating service-quality signals from unstructured text
-
----
-
-## Results
-
-| Class | Precision | Recall | F1 |
-|---|---|---|---|
-| Negative | 0.9393 | 0.9261 | 0.9327 |
-| Neutral | 0.6934 | 0.7661 | 0.7280 |
-| Positive | 0.9789 | 0.9674 | 0.9731 |
-| **Weighted Avg** | **0.9407** | **0.9376** | **0.9389** |
-
-### Confusion Matrix
-```
+### Confusion Matrix (40,000 Held-Out Reviews)
+```text
                Predicted
                Neg    Neu    Pos
 Actual  Neg  [ 7712   585    30]
@@ -79,15 +46,35 @@ Actual  Neg  [ 7712   585    30]
         Pos  [   56   840 26570]
 ```
 
+### Iteration History
+
+| Version | Key Change | Weighted F1 | Neutral F1 |
+|:---|:---|:---:|:---:|
+| v1 | BERT-base baseline | 0.881 | 0.514 |
+| v3 | RoBERTa-base | 0.892 | 0.573 |
+| v4 | `max_len` 256→512 | 0.904 | 0.604 |
+| v6 | RoBERTa-large | 0.912 | 0.612 |
+| **Final** | **EDA-driven class weights (3.0 / 8.0 / 1.5)** | **0.9389** | **0.728** |
+
 ---
 
-## Dataset
+## Evaluation 2: Public 500-Review Calibration & Triage Benchmark
 
-- **Source:** Yelp Academic Dataset (500K reviews)
-- **Cleaning:** 711 duplicate rows removed before modeling
-- **Label mapping:** 1–2 stars → Negative · 3 stars → Neutral · 4–5 stars → Positive
-- **Training samples:** 239,870 (stratified split)
-- **Test samples:** 40,000 (stratified, held-out)
+To enable full reproducibility of post-hoc calibration and routing thresholds, a fixed 500-review reference set is published at [`Zhoyang/yelp-sentiment-3class-eval`](https://huggingface.co/datasets/Zhoyang/yelp-sentiment-3class-eval) (pinned revision `a2aa98f96cc2e829904f47984747667d3be53663`). Errors concentrate sharply at the 2–3-star boundary (`20.00%` error rate on 2★ and `46.00%` on 3★ vs. `1.18%` on 1★ and `1.20%` on 5★).
+
+### Out-of-Fold Threshold Routing (`0%–30%` Human Review Capacity)
+
+| Reference budget | OOF flagged share | Auto-route n | Auto-route error rate | Errors in review queue |
+| --- | --- | --- | --- | --- |
+| 0% | 0.0% | 500 | 7.80% | 0 |
+| 5% | 4.8% | 476 | 5.46% | 13 |
+| 10% | 9.4% | 453 | 4.86% | 17 |
+| 15% | 15.2% | 424 | 3.77% | 23 |
+| 20% | 20.0% | 400 | 2.75% | 28 |
+| 25% | 24.6% | 377 | 2.12% | 31 |
+| 30% | 30.8% | 346 | 1.73% | 33 |
+
+> **Scope & Boundaries:** Auto-route error rates measure only reviews handled automatically; human reviewer accuracy is unmeasured (the cost trade-off calculator in the [Interactive Space](https://huggingface.co/spaces/Zhoyang/yelp-sentiment-analyzer) treats human review as 100% accurate as a scenario upper bound and uses user-supplied hypothetical cost weights on this 500-review sample). It does not measure customer churn, retention uplift, or production business savings.
 
 ---
 
@@ -95,21 +82,11 @@ Actual  Neg  [ 7712   585    30]
 
 | Parameter | Value |
 |---|---|
-| Base model | `roberta-large` (355M parameters) |
+| Base model | `FacebookAI/roberta-large` (355M parameters) |
+| Training / Held-out test samples | 239,870 / 40,000 (stratified split from 499,229 cleaned Yelp reviews) |
 | Max token length | 512 |
 | Class weights (Loss) | Negative 3.0 · Neutral 8.0 · Positive 1.5 |
-| Hardware | NVIDIA A4000 (Paperspace Gradient) |
-
-Class-weighted loss was applied to address the natural imbalance in Yelp data (~55% positive reviews).
-
----
-
-## Limitations
-
-- Yelp reviews are domain-specific; performance may not transfer directly to other types of customer feedback.
-- The neutral class is harder to classify than positive or negative reviews, as shown by the lower neutral F1 score.
-- Star ratings are used as sentiment labels, which can introduce noise when review text and rating do not fully agree.
-- Long reviews may be truncated to the model's maximum token length.
+| Hardware | NVIDIA RTX A4000 (Paperspace Gradient) |
 
 ---
 
@@ -120,47 +97,20 @@ from transformers import pipeline
 
 classifier = pipeline(
     "text-classification",
-    model="Zhoyang/yelp-sentiment-roberta-large"
+    model="Zhoyang/yelp-sentiment-roberta-large",
+    revision="2e39ef29d577aa84cfe70596020eb40e708b88a0",
+    top_k=None,
+    truncation=True,
+    max_length=512,
 )
 
-id2label = {"LABEL_0": "Negative", "LABEL_1": "Neutral", "LABEL_2": "Positive"}
-
-result = classifier("The food was absolutely amazing!")
-print(id2label[result[0]["label"]], round(result[0]["score"], 4))
-# Positive 0.9741
+scores = classifier("The food was okay, but the service was slow.")
+print(scores)
 ```
 
 ---
 
-## Notebook
+## Notebook & Repository Files
 
-[`yelp_sentiment_roberta.ipynb`](./yelp_sentiment_roberta.ipynb) contains the full evaluation pipeline:
-- Data loading and label mapping
-- Stratified train/test split
-- EDA: star distribution, token length analysis, truncation rates
-- Custom PyTorch Dataset and DataLoader
-- Batch inference on GPU
-- Classification report and confusion matrix
-
-> **Setup:** Set `HF_TOKEN` as an environment variable before running.
-
----
-
-## Tech Stack
-
-`Python` · `PyTorch` · `Transformers` · `scikit-learn` · `pandas` · `matplotlib`
-
-## Open Source Maintenance
-
-- License: [MIT](./LICENSE)
-- Contributions: [CONTRIBUTING.md](./CONTRIBUTING.md)
-- Roadmap: [ROADMAP.md](./ROADMAP.md)
-- Security and responsible reporting: [SECURITY.md](./SECURITY.md)
-
-The current maintenance focus is reproducibility, clearer evaluation artifacts,
-responsible use guidance, and practical inference examples for public review
-analytics workflows.
-
----
-
-*Public, non-confidential version of an NDA-covered PathSynch Labs analytics internship project, Spring 2026.*
+- [`yelp_sentiment_roberta.ipynb`](./yelp_sentiment_roberta.ipynb): Full training and 40,000-review evaluation pipeline (EDA, token-length analysis, weighted-loss training, classification report, and confusion matrix).
+- License: [MIT](./LICENSE) · Contributions: [CONTRIBUTING.md](./CONTRIBUTING.md) · Roadmap: [ROADMAP.md](./ROADMAP.md) · Security: [SECURITY.md](./SECURITY.md)
