@@ -44,7 +44,7 @@ from transformers import pipeline
 
 classifier = pipeline(
     "text-classification",
-    model="Zhoyang/yelp-sentiment-roberta-large"
+    model="Zhoyang/review-triage-roberta-large"
 )
 ```
 

@@ -2,9 +2,9 @@
 
 Fine-tuned `FacebookAI/roberta-large` on 239,870 Yelp reviews for 3-class review classification (Negative 1–2★ / Neutral 3★ / Positive 4–5★), achieving **93.76% accuracy** and **0.9389 weighted F1** on a 40,000-review held-out test set—paired with a reproducible 500-review out-of-fold (OOF) probability calibration benchmark, selective human-review routing under capacity constraints, and a DKK review-cost versus missed-error trade-off calculator.
 
-- **Model Card & Full Benchmark:** [`Zhoyang/yelp-sentiment-roberta-large`](https://huggingface.co/Zhoyang/yelp-sentiment-roberta-large)
-- **Interactive Triage & Cost Trade-Off Space:** [`Zhoyang/yelp-sentiment-analyzer`](https://huggingface.co/spaces/Zhoyang/yelp-sentiment-analyzer)
-- **Public 500-Review Evaluation Set:** [`Zhoyang/yelp-sentiment-3class-eval`](https://huggingface.co/datasets/Zhoyang/yelp-sentiment-3class-eval)
+- **Model Card & Full Benchmark:** [`Zhoyang/review-triage-roberta-large`](https://huggingface.co/Zhoyang/review-triage-roberta-large)
+- **Interactive Triage & Cost Trade-Off Space:** [`Zhoyang/review-triage-cost-routing`](https://huggingface.co/spaces/Zhoyang/review-triage-cost-routing)
+- **Public 500-Review Evaluation Set:** [`Zhoyang/review-triage-500-eval`](https://huggingface.co/datasets/Zhoyang/review-triage-500-eval)
 - **HF Collection:** [Calibrated Review Triage & Cost-Optimal Routing Suite](https://huggingface.co/collections/Zhoyang/calibrated-review-triage-and-cost-optimal-routing-suite-6ad605c8ded5824ee51efbd4)
 
 ---
@@ -22,7 +22,7 @@ Proprietary client data, stakeholder feedback, and client-specific implementatio
 ## What This Project Demonstrates
 
 - **Controlled transformer fine-tuning (`roberta-large`, 355M parameters):** Seven iterations from a `bert-base` baseline, where expanding sequence length (`256 → 512` tokens, `+0.012` weighted F1) and applying EDA-driven class weights (`Negative 3.0 / Neutral 8.0 / Positive 1.5`) lifted Neutral-class F1 from `0.612` to `0.728`.
-- **Out-of-fold probability calibration:** 5-fold stratified temperature scaling on the pinned 500-review benchmark (`Zhoyang/yelp-sentiment-3class-eval`) reduces Expected Calibration Error (ECE) from `0.0364` to `0.0147` and NLL from `0.2372` to `0.2184`.
+- **Out-of-fold probability calibration:** 5-fold stratified temperature scaling on the pinned 500-review benchmark (`Zhoyang/review-triage-500-eval`) reduces Expected Calibration Error (ECE) from `0.0364` to `0.0147` and NLL from `0.2372` to `0.2184`.
 - **Selective prediction & human-in-the-loop (HITL) triage:** Routing the lowest top-two probability-margin reviews to human review reduces the error rate among automatically routed reviews from `7.80%` (at `0%` review) to `4.86%` (at `~10%` review) and `2.75%` (at `~20%` review), while quantifying diminishing marginal returns (`1.85` reviews inspected per error caught at `0%→5%` vs. `4.67` cumulative at `20%`).
 - **Decision-theoretic cost trade-off framework:** Parameterizes human review cost per item (benchmarked using Statistics Denmark `LONS20` 2024 standardized hourly earnings for customer service clerks: `246.15 DKK/hour` → `4.10 DKK/review` at 1 minute/review) against hypothetical downstream missed-error loss to evaluate total cost across `0%–30%` routing tiers.
 
@@ -60,7 +60,7 @@ Actual  Neg  [ 7712   585    30]
 
 ## Evaluation 2: Public 500-Review Calibration & Triage Benchmark
 
-To enable full reproducibility of post-hoc calibration and routing thresholds, a fixed 500-review reference set is published at [`Zhoyang/yelp-sentiment-3class-eval`](https://huggingface.co/datasets/Zhoyang/yelp-sentiment-3class-eval) (pinned revision `a2aa98f96cc2e829904f47984747667d3be53663`). Errors concentrate sharply at the 2–3-star boundary (`20.00%` error rate on 2★ and `46.00%` on 3★ vs. `1.18%` on 1★ and `1.20%` on 5★).
+To enable full reproducibility of post-hoc calibration and routing thresholds, a fixed 500-review reference set is published at [`Zhoyang/review-triage-500-eval`](https://huggingface.co/datasets/Zhoyang/review-triage-500-eval) (pinned revision `a2aa98f96cc2e829904f47984747667d3be53663`). Errors concentrate sharply at the 2–3-star boundary (`20.00%` error rate on 2★ and `46.00%` on 3★ vs. `1.18%` on 1★ and `1.20%` on 5★).
 
 ### Out-of-Fold Threshold Routing (`0%–30%` Human Review Capacity)
 
@@ -74,7 +74,7 @@ To enable full reproducibility of post-hoc calibration and routing thresholds, a
 | 25% | 24.6% | 377 | 2.12% | 31 |
 | 30% | 30.8% | 346 | 1.73% | 33 |
 
-> **Scope & Boundaries:** Auto-route error rates measure only reviews handled automatically; human reviewer accuracy is unmeasured (the cost trade-off calculator in the [Interactive Space](https://huggingface.co/spaces/Zhoyang/yelp-sentiment-analyzer) treats human review as 100% accurate as a scenario upper bound and uses user-supplied hypothetical cost weights on this 500-review sample). It does not measure customer churn, retention uplift, or production business savings.
+> **Scope & Boundaries:** Auto-route error rates measure only reviews handled automatically; human reviewer accuracy is unmeasured (the cost trade-off calculator in the [Interactive Space](https://huggingface.co/spaces/Zhoyang/review-triage-cost-routing) treats human review as 100% accurate as a scenario upper bound and uses user-supplied hypothetical cost weights on this 500-review sample). It does not measure customer churn, retention uplift, or production business savings.
 
 ---
 
@@ -97,7 +97,7 @@ from transformers import pipeline
 
 classifier = pipeline(
     "text-classification",
-    model="Zhoyang/yelp-sentiment-roberta-large",
+    model="Zhoyang/review-triage-roberta-large",
     revision="2e39ef29d577aa84cfe70596020eb40e708b88a0",
     top_k=None,
     truncation=True,
